@@ -5,6 +5,7 @@ from database import SessionLocal, engine, Base
 from models import User as UserModel, DrinkingHabits as DrinkingHabitsModel
 from schemas import User, UserCreate, DrinkingHabits, DrinkingHabitsCreate
 
+
 # SQLAlchemy 테이블 생성
 Base.metadata.create_all(bind=engine)
 
