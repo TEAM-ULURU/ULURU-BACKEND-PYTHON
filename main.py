@@ -8,6 +8,7 @@ from schemas import User, UserCreate, DrinkingHabits, DrinkingHabitsCreate
 # SQLAlchemy 테이블 생성
 Base.metadata.create_all(bind=engine)
 
+# branch test lgy
 
 app = FastAPI()
 
