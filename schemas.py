@@ -27,6 +27,9 @@ class MemberBase(BaseModel):
     degree_of_intoxication: Optional[str] = None
     percent_per_reference_value: Optional[float] = None
 
+    current_level_of_intoxication: Optional[float] = None
+    current_blood_alcohol_level: Optional[float] = None
+
     number_of_drinks: Optional[int] = None
 
     # Etc

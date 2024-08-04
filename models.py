@@ -19,6 +19,8 @@ class Member(Base):
     height = Column(Float, nullable=False)
     weight = Column(Float, nullable=False)
     body_fat_percentage = Column(Float, nullable=True)
+    current_level_of_intoxication = Column(Float, nullable=False)
+    current_blood_alcohol_level = Column(Float, nullable=False)
 
     #email = Column(String, nullable=False)
 
