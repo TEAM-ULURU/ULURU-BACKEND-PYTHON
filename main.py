@@ -40,7 +40,7 @@ def decode_token(token: str):
         ) from e
 
 
-# Member 생성 엔드포인트
+# Member 저장 엔드포인트
 @app.post("/save_members/", response_model=Member)
 def create_member(member: MemberCreate, token: str, db: Session = Depends(get_db)):
     #print("start decode")
@@ -88,10 +88,40 @@ def create_room(room: RoomCreate, db: Session = Depends(get_db)):
 #     db.refresh(db_member_friend)
 #     return db_member_friend
 
+# 혈중알코올농도 API
+@app.get("/BAC/{member_id}")
+def read_member(member_id: int, db: Session = Depends(get_db)):
+    db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
+    print(db_member)
+    # 성별에 따른 R 값 설정
+    r = 0.68 if db_member.gender == "Male" else 0.55
+    print(r)
+    # 주종에 따른 알코올 농도
+    alcohol_percentage = 16 #if db_member.type_of_alcohol == "SOJU" else 5
+    # 섭취한 술의 양
+    alcohol_volume_ml = db_member.number_of_drinks * db_member.number_of_bottles
+
+    # 섭취한 알코올의 양 (g) 계산
+    alcohol_consumed = alcohol_volume_ml * (alcohol_percentage / 100) * 0.7894
+
+    # BAC 계산
+    bac = (alcohol_consumed / (db_member.weight * r)) / 10  # BAC는 mg/10 = %
+    print(bac)
+    # DB에 저장
+    db_member.current_blood_alcohol_level = bac
+    db.commit()
+    db.refresh(db_member)
+
+    if db_member is None:
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    return db_member.current_blood_alcohol_level
+
+
 # Member 읽기 엔드포인트
 @app.get("/members/{member_id}", response_model=Member)
 def read_member(member_id: int, db: Session = Depends(get_db)):
-    db_member = db.query(MemberModel).filter(MemberModel.id == member_id).first()
+    db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
     if db_member is None:
         raise HTTPException(status_code=404, detail="Member not found")
     return db_member
