@@ -40,7 +40,7 @@ def decode_token(token: str):
         ) from e
 
 
-# Member 저장 엔드포인트
+# Member 저장 API
 @app.post("/save_members/", response_model=Member)
 def create_member(member: MemberCreate, token: str, db: Session = Depends(get_db)):
     #print("start decode")
@@ -61,7 +61,7 @@ def create_member(member: MemberCreate, token: str, db: Session = Depends(get_db
     db.refresh(db_member)
     return db_member
 
-# Room 생성 엔드포인트
+# Room 생성 API
 @app.post("/rooms/", response_model=Room)
 def create_room(room: RoomCreate, db: Session = Depends(get_db)):
     db_room = RoomModel(**room.dict(exclude_unset=True))
@@ -136,8 +136,8 @@ def read_member(member_id: int, db: Session = Depends(get_db)):
     return db_member.current_level_of_intoxication
 
 
-# Member 읽기 엔드포인트
-@app.get("/members/{member_id}", response_model=Member)
+# calendar_info API
+@app.get("/calendar_info/{member_id}", response_model=Member)
 def read_member(member_id: int, db: Session = Depends(get_db)):
     db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
     if db_member is None:
