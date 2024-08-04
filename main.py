@@ -24,21 +24,34 @@ def get_db():
 def decode_token(token: str):
     try:
         payload = jwt.decode(token, settings.JWT_ACCESS_SECRET, algorithms=[settings.ALGORITHM])
+        #print(payload)
         return payload.get("member_id")
-    except jwt.PyJWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+    except jwt.ExpiredSignatureError:
+        print("Token has expired")
+        return None
+    except jwt.InvalidTokenError:
+        print("Invalid token")
+        return None
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid access token",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from e
 
 
 # Member 생성 엔드포인트
 @app.post("/save_members/", response_model=Member)
-def create_member(member: MemberCreate, db: Session = Depends(get_db)):
-    #member_id = decode_token(token)
-    member_id = 1
-    # if not member_id:
-    #     raise HTTPException(status_code=401, detail="Invalid token")
+def create_member(member: MemberCreate, token: str, db: Session = Depends(get_db)):
+    #print("start decode")
+    member_id = decode_token(token)
+    #print(member_id)
+    #member_id = 1
+    if not member_id:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
     db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
-    print(db_member)
+    #print(db_member)
     if not db_member:
         raise HTTPException(status_code=404, detail="Member not found")
     for key, value in vars(member).items():
