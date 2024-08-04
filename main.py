@@ -118,6 +118,24 @@ def read_member(member_id: int, db: Session = Depends(get_db)):
     return db_member.current_blood_alcohol_level
 
 
+# 취한 정도 API
+@app.get("/intoxication/{member_id}")
+def read_member(member_id: int, db: Session = Depends(get_db)):
+    db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
+    # 취한 정도 계산
+    i = ((db_member.current_blood_alcohol_level - 0.02) / (0.31-0.02)) * 95 + 5
+
+    # DB에 저장
+    db_member.current_level_of_intoxication = i
+    db.commit()
+    db.refresh(db_member)
+
+    if db_member is None:
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    return db_member.current_level_of_intoxication
+
+
 # Member 읽기 엔드포인트
 @app.get("/members/{member_id}", response_model=Member)
 def read_member(member_id: int, db: Session = Depends(get_db)):
