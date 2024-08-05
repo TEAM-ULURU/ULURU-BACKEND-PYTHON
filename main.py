@@ -2,6 +2,7 @@ import json
 
 import jwt
 from fastapi import FastAPI, Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
 from config import settings
@@ -13,6 +14,8 @@ from schemas import *
 # Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # 의존성 주입 함수
 def get_db():
@@ -44,7 +47,7 @@ def decode_token(token: str):
 
 # Member 저장 API
 @app.post("/save_members/", response_model=Member)
-def create_member(member: MemberCreate, token: str, db: Session = Depends(get_db)):
+def create_member(member: MemberCreate, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     #print("start decode")
     member_id = decode_token(token)
     #print(member_id)
