@@ -143,7 +143,7 @@ def read_member(member_id: int, db: Session = Depends(get_db)):
     alcohol_consumed = alcohol_beer + alcohol_soju
 
     # BAC 계산
-    bac = (alcohol_consumed / (db_member.weight * r)) / 10  # BAC는 mg/10 = %
+    bac = round((alcohol_consumed / (db_member.weight * r)) / 10, 2)  # BAC는 mg/10 = %
     print(bac)
     # DB에 저장
     db_member.current_blood_alcohol_level = bac
