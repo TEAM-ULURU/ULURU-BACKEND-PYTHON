@@ -4,6 +4,7 @@ import jwt
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
+from starlette.middleware.cors import CORSMiddleware
 
 from config import settings
 from database import SessionLocal, engine, Base
@@ -15,7 +16,18 @@ from schemas import *
 
 app = FastAPI()
 
-#oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+origins = [
+    "http://localhost.3000"
+]
+app. add_middleware (
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # 의존성 주입 함수
 def get_db():
@@ -48,6 +60,27 @@ def decode_token(token: str):
 # Member 저장 API
 @app.post("/save_members/", response_model=Member)
 def create_member(member: MemberCreate, token: str, db: Session = Depends(get_db)):
+    #print("start decode")
+    member_id = decode_token(token)
+    print(member_id)
+    #member_id = 1
+    if not member_id:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
+    #print(db_member)
+    if not db_member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    for key, value in vars(member).items():
+        if value is not None:
+            setattr(db_member, key, value)
+    db.commit()
+    db.refresh(db_member)
+    return db_member
+
+# Member 저장 API - 토큰 넘기는 방식 헤더부분으로
+@app.post("/save_members_header/", response_model=Member)
+def create_member(member: MemberCreate, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     #print("start decode")
     member_id = decode_token(token)
     print(member_id)
