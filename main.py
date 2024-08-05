@@ -190,6 +190,22 @@ def read_member(member_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Member not found")
     return db_member.drinking_date
 
+# member 데이터 가져오는 api
+@app.get("/member_info/{member_id}", response_model=Member)
+def read_member(member_id: int, db: Session = Depends(get_db)):
+    calendar_dict = dict()
+    db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
+    calendar_dict[db_member.drinking_date] = [db_member.current_blood_alcohol_level, db_member.current_level_of_intoxication]
+    print(calendar_dict)
+    # DB에 저장
+    db_member.drinking_date = json.dumps(calendar_dict)
+    print(db_member.drinking_date)
+    db.commit()
+    db.refresh(db_member)
+    if db_member is None:
+        raise HTTPException(status_code=404, detail="Member not found")
+    return db_member.drinking_date
+
 # Room 읽기 엔드포인트
 @app.get("/rooms/{room_id}", response_model=Room)
 def read_room(room_id: int, db: Session = Depends(get_db)):
@@ -197,6 +213,15 @@ def read_room(room_id: int, db: Session = Depends(get_db)):
     if db_room is None:
         raise HTTPException(status_code=404, detail="Room not found")
     return db_room
+
+
+@app.get("/get_payload/{token}")
+def get_payload_info(token: str):
+    member_id = decode_token(token)
+    if not member_id:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    return member_id
+
 
 # # Calendar 읽기 엔드포인트
 # @app.get("/calendars/{calendar_id}", response_model=Calendar)
