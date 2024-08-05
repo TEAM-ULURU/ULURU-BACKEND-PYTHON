@@ -14,7 +14,7 @@ class Member(Base):
     __tablename__ = 'member'
     member_id = Column(Integer, primary_key=True, index=True)
     gender = Column(String, nullable=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=True)
     age = Column(Integer, nullable=False)
     height = Column(Float, nullable=False)
     weight = Column(Float, nullable=False)
