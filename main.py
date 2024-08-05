@@ -15,7 +15,7 @@ from schemas import *
 
 app = FastAPI()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+#oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # 의존성 주입 함수
 def get_db():
@@ -47,10 +47,10 @@ def decode_token(token: str):
 
 # Member 저장 API
 @app.post("/save_members/", response_model=Member)
-def create_member(member: MemberCreate, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def create_member(member: MemberCreate, token: str, db: Session = Depends(get_db)):
     #print("start decode")
     member_id = decode_token(token)
-    #print(member_id)
+    print(member_id)
     #member_id = 1
     if not member_id:
         raise HTTPException(status_code=401, detail="Invalid token")
