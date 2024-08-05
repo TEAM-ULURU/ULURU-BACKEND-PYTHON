@@ -11,10 +11,10 @@ from typing import List, Optional
 # Member Pydantic model
 class MemberBase(BaseModel):
     gender: Optional[str] = None
-    name: str
-    age: int
-    height: float
-    weight: float
+    name: str = None
+    age: int = None
+    height: float = None
+    weight: float = None
     body_fat_percentage: Optional[float] = None
     #email: str
 
