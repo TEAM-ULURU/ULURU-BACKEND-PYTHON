@@ -1,3 +1,5 @@
+import json
+
 import jwt
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -96,13 +98,15 @@ def read_member(member_id: int, db: Session = Depends(get_db)):
     # 성별에 따른 R 값 설정
     r = 0.68 if db_member.gender == "Male" else 0.55
     print(r)
-    # 주종에 따른 알코올 농도
-    alcohol_percentage = 16 #if db_member.type_of_alcohol == "SOJU" else 5
     # 섭취한 술의 양
-    alcohol_volume_ml = db_member.number_of_drinks * db_member.number_of_bottles
+    alcohol_volume_beer = db_member.now_beer_ml * db_member.now_drink_beer
+    alcohol_volume_soju = db_member.now_soju_ml * db_member.now_drink_soju
 
     # 섭취한 알코올의 양 (g) 계산
-    alcohol_consumed = alcohol_volume_ml * (alcohol_percentage / 100) * 0.7894
+    alcohol_beer = alcohol_volume_beer * (5 / 100) * 0.7894
+    alcohol_soju = alcohol_volume_soju * (16 / 100) * 0.7894
+
+    alcohol_consumed = alcohol_beer + alcohol_soju
 
     # BAC 계산
     bac = (alcohol_consumed / (db_member.weight * r)) / 10  # BAC는 mg/10 = %
@@ -139,10 +143,18 @@ def read_member(member_id: int, db: Session = Depends(get_db)):
 # calendar_info API
 @app.get("/calendar_info/{member_id}", response_model=Member)
 def read_member(member_id: int, db: Session = Depends(get_db)):
+    calendar_dict = dict()
     db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
+    calendar_dict[db_member.drinking_date] = [db_member.current_blood_alcohol_level, db_member.current_level_of_intoxication]
+    print(calendar_dict)
+    # DB에 저장
+    db_member.drinking_date = json.dumps(calendar_dict)
+    print(db_member.drinking_date)
+    db.commit()
+    db.refresh(db_member)
     if db_member is None:
         raise HTTPException(status_code=404, detail="Member not found")
-    return db_member
+    return db_member.drinking_date
 
 # Room 읽기 엔드포인트
 @app.get("/rooms/{room_id}", response_model=Room)

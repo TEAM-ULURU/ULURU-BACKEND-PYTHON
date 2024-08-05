@@ -19,6 +19,7 @@ class MemberBase(BaseModel):
     #email: str
 
     # Drink information
+    drinking_date: Optional[str] = None
     drinking_frequency_reference_value: Optional[str] = None
     drinking_frequency: Optional[float] = None
     type_of_alcohol: Optional[str] = None #enum 제거
@@ -26,11 +27,15 @@ class MemberBase(BaseModel):
     number_of_bottles: Optional[float] = None
     degree_of_intoxication: Optional[str] = None
     percent_per_reference_value: Optional[float] = None
+    number_of_drinks: Optional[int] = None
 
     current_level_of_intoxication: Optional[float] = None
     current_blood_alcohol_level: Optional[float] = None
 
-    number_of_drinks: Optional[int] = None
+    now_beer_ml: Optional[float] = None
+    now_drink_beer: Optional[float] = None
+    now_soju_ml: Optional[float] = None
+    now_drink_soju: Optional[float] = None
 
     # Etc
     emergency_contact: Optional[str] = None
@@ -39,7 +44,6 @@ class MemberBase(BaseModel):
 
     is_oauth: Optional[bool] = None
 
-    calendar_id: Optional[int] = None
     room_id: Optional[int] = None
 
 

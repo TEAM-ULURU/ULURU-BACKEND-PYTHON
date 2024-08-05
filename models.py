@@ -19,12 +19,13 @@ class Member(Base):
     height = Column(Float, nullable=False)
     weight = Column(Float, nullable=False)
     body_fat_percentage = Column(Float, nullable=True)
-    current_level_of_intoxication = Column(Float, nullable=False)
-    current_blood_alcohol_level = Column(Float, nullable=False)
+    current_level_of_intoxication = Column(Float, nullable=True)
+    current_blood_alcohol_level = Column(Float, nullable=True)
 
     #email = Column(String, nullable=False)
 
     #drink information
+    drinking_date = Column(String, nullable=True) # 캘린더 날짜 정보
     drinking_frequency_reference_value = Column(String, nullable=True)
     drinking_frequency = Column(Float, nullable=True)
     type_of_alcohol = Column(String, nullable=True) #enum 제거
@@ -32,8 +33,12 @@ class Member(Base):
     number_of_bottles = Column(Float, nullable=True)
     degree_of_intoxication = Column(String, nullable=True)
     percent_per_reference_value = Column(Float, nullable=True)
-
     number_of_drinks = Column(Integer, nullable=True)
+
+    now_beer_ml = Column(Float, nullable=True)
+    now_drink_beer = Column(Float, nullable=True)
+    now_soju_ml = Column(Float, nullable=True)
+    now_drink_soju = Column(Float, nullable=True)
 
     #etc
     emergency_contact = Column(String, nullable=True)
