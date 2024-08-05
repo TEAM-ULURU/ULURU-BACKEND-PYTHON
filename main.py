@@ -1,7 +1,7 @@
 import json
 
 import jwt
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
@@ -57,7 +57,7 @@ def decode_token(token: str):
 
 # Member 저장 API
 @app.post("/save_members/", response_model=Member)
-def create_member(member: MemberCreate, token: str, db: Session = Depends(get_db)):
+def create_member(member: MemberCreate, token: str = Query(...), db: Session = Depends(get_db)):
     #print("start decode")
     member_id = decode_token(token)
     print(member_id)
