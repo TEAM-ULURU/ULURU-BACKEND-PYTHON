@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Column, String, Integer, Float, Boolean, ForeignKey, Enum
+from sqlalchemy import Column, String, Integer, Float, Boolean, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -21,6 +21,8 @@ class Member(Base):
     body_fat_percentage = Column(Float, nullable=True)
     current_level_of_intoxication = Column(Float, nullable=True)
     current_blood_alcohol_level = Column(Float, nullable=True)
+
+    calendar_info = Column(JSON, nullable=True)
 
     #email = Column(String, nullable=False)
 

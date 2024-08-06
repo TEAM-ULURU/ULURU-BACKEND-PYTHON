@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, json
 from typing import List, Optional
 
 # class AlcoholType(str, Enum):
@@ -26,6 +26,7 @@ class MemberBase(BaseModel):
     weight: float = None
     body_fat_percentage: Optional[float] = None
     #email: str
+    calendar_info = Optional[json] = None
 
     # Drink information
     drinking_date: Optional[str] = None
