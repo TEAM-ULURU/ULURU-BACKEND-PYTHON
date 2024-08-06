@@ -26,7 +26,7 @@ class MemberBase(BaseModel):
     weight: float = None
     body_fat_percentage: Optional[float] = None
     #email: str
-    calendar_info = Optional[dict] = None
+    calendar_info: Optional[dict] = None
 
     # Drink information
     drinking_date: Optional[str] = None
