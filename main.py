@@ -146,11 +146,11 @@ def create_room(room: RoomCreate, db: Session = Depends(get_db)):
 
 # 혈중알코올농도 API
 @app.get("/BAC/{member_id}")
-def read_member(member_id: int, db: Session = Depends(get_db)):
+def get_BAC(member_id: int, db: Session = Depends(get_db)):
     db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
     print(db_member)
     # 성별에 따른 R 값 설정
-    r = 0.68 if db_member.gender == "Male" else 0.55
+    r = 0.68 if db_member.gender == "male" else 0.55
     print(r)
     # 섭취한 술의 양
     alcohol_volume_beer = db_member.now_beer_ml * db_member.now_drink_beer
@@ -178,7 +178,7 @@ def read_member(member_id: int, db: Session = Depends(get_db)):
 
 # 취한 정도 API
 @app.get("/intoxication/{member_id}")
-def read_member(member_id: int, db: Session = Depends(get_db)):
+def get_intoxication(member_id: int, db: Session = Depends(get_db)):
     db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
     # 취한 정도 계산
     i = ((db_member.current_blood_alcohol_level - 0.02) / (0.31-0.02)) * 95 + 5
@@ -193,6 +193,50 @@ def read_member(member_id: int, db: Session = Depends(get_db)):
 
     return db_member.current_level_of_intoxication
 
+
+# 취한 정도 and 혈중알코올 농도 api
+@app.get("/BAC_intoxication/{member_id}")
+def get_BAC_intoxication(member_id: int, db: Session = Depends(get_db)):
+    db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
+    combine_data = {}
+    # 성별에 따른 R 값 설정
+    r = 0.68 if db_member.gender == "male" else 0.55
+    print(r)
+    # 섭취한 술의 양
+    alcohol_volume_beer = db_member.now_beer_ml * db_member.now_drink_beer
+    alcohol_volume_soju = db_member.now_soju_ml * db_member.now_drink_soju
+
+    # 섭취한 알코올의 양 (g) 계산
+    alcohol_beer = alcohol_volume_beer * (5 / 100) * 0.7894
+    alcohol_soju = alcohol_volume_soju * (16 / 100) * 0.7894
+
+    alcohol_consumed = alcohol_beer + alcohol_soju
+
+    # BAC 계산
+    bac = round((alcohol_consumed / (db_member.weight * r)) / 10, 2)  # BAC는 mg/10 = %
+    print(bac)
+    # DB에 저장
+    db_member.current_blood_alcohol_level = bac
+    db.commit()
+    db.refresh(db_member)
+
+    # 취한 정도 계산
+    i = ((db_member.current_blood_alcohol_level - 0.02) / (0.31 - 0.02)) * 95 + 5
+
+    # DB에 저장
+    db_member.current_level_of_intoxication = i
+    db.commit()
+    db.refresh(db_member)
+
+    combine_data = {
+        "BAC": db_member.current_blood_alcohol_level,
+        "intoxication": db_member.current_level_of_intoxication
+    }
+
+    if db_member is None:
+        raise HTTPException(status_code=404, detail="Member not found")
+
+    return combine_data
 
 # calendar_info API
 @app.get("/calendar_info/{member_id}", response_model=Member)
