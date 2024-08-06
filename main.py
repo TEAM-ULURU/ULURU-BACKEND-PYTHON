@@ -116,6 +116,7 @@ def save_date(member: MemberCreate, token: str = Query(...), db: Session = Depen
     db.refresh(db_member)
     return db_member
 
+
 # Room 생성 API
 @app.post("/rooms/", response_model=Room)
 def create_room(room: RoomCreate, db: Session = Depends(get_db)):
@@ -193,21 +194,25 @@ def read_member(member_id: int, db: Session = Depends(get_db)):
     return db_member.current_level_of_intoxication
 
 
-# # calendar_info API
-# @app.get("/calendar_info/{member_id}", response_model=Member)
-# def read_member(member_id: int, db: Session = Depends(get_db)):
-#     calendar_info = dict()
-#     db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
-#     calendar_info[db_member.drinking_date] = [db_member.current_blood_alcohol_level, db_member.current_level_of_intoxication]
-#     print(calendar_info)
-#     # DB에 저장
-#     db_member.calendar_info = json.dumps(calendar_info)
-#     print(db_member.calendar_info)
-#     db.commit()
-#     db.refresh(db_member)
-#     if db_member is None:
-#         raise HTTPException(status_code=404, detail="Member not found")
-#     return db_member.calendar_info
+# calendar_info API
+@app.get("/calendar_info/{member_id}", response_model=Member)
+def read_member(member_id: int, db: Session = Depends(get_db)):
+    calendar_info_json = {}
+    db_member = db.query(MemberModel).filter(MemberModel.member_id == member_id).first()
+    calendar_info_json[db_member.drinking_date] = []
+    calendar_info_json[db_member.drinking_date].append({
+        "current_blood_alcohol_level": db_member.current_blood_alcohol_level,
+        "current_level_of_intoxication": db_member.current_level_of_intoxication
+    })
+    print(calendar_info_json)
+    # DB에 저장
+    db_member.calendar_info = calendar_info_json
+    print(db_member.calendar_info)
+    db.commit()
+    db.refresh(db_member)
+    if db_member is None:
+        raise HTTPException(status_code=404, detail="Member not found")
+    return db_member.calendar_info
 
 # member 데이터 가져오는 api
 @app.get("/member_info/{member_id}", response_model=Member)
