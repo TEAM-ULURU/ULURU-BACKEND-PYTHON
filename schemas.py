@@ -8,6 +8,15 @@ from typing import List, Optional
 #     BEER = "BEER"
 #     ETC = "ETC"
 
+class CalendarDate(BaseModel):
+    member_id: int
+    drinking_date: Optional[str] = None
+
+    class Config:
+        orm_mode = True
+
+
+
 # Member Pydantic model
 class MemberBase(BaseModel):
     gender: Optional[str] = None
