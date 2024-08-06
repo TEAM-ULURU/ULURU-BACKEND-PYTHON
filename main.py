@@ -40,7 +40,7 @@ def decode_token(token: str):
     try:
         payload = jwt.decode(token, settings.JWT_ACCESS_SECRET, algorithms=[settings.ALGORITHM])
         #print(payload)
-        return payload.get("member_id")
+        return payload.get("sub")
     except jwt.ExpiredSignatureError:
         print("Token has expired")
         return None
