@@ -47,7 +47,7 @@ class Member(Base):
     street_name_address = Column(String, nullable=True)
     detail_address = Column(String, nullable=True)
 
-    is_oauth = Column(Boolean, nullable=True)
+    is_oauth = Column(Integer, nullable=True)
 
     # calendar_id = Column(Integer, ForeignKey('calendar.calendar_id'), nullable=True)
     # calendar = relationship("Calendar", back_populates="members")

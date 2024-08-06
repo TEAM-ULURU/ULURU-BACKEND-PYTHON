@@ -52,7 +52,7 @@ class MemberBase(BaseModel):
     street_name_address: Optional[str] = None
     detail_address: Optional[str] = None
 
-    is_oauth: Optional[bool] = None
+    is_oauth: Optional[int] = None
 
     room_id: Optional[int] = None
 
